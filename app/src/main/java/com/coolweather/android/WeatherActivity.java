@@ -1,5 +1,6 @@
 package com.coolweather.android;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -79,9 +80,8 @@ public class WeatherActivity extends AppCompatActivity {
         sportText = (TextView)findViewById(R.id.sport_text);
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.refresh_day);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String weatherString = prefs.getString("weather", null);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         bingPicImg = (ImageView)findViewById(R.id.bing_ic_img);
         String bingPic = prefs.getString("bing_pic", null);
         if (bingPic != null){
@@ -90,14 +90,15 @@ public class WeatherActivity extends AppCompatActivity {
             loadBingPic();
         }
 
-//        if (weatherString != null){
-//            Weather weather = Utility.handelWeatherResponse(weatherString);
-//            showWeatherInfo(weather);
-//        }else {
-//        }
+        String weatherString = prefs.getString("weather", null);
         final String weatherId = getIntent().getStringExtra("weather_id");
-        weatherLayout.setVisibility(View.INVISIBLE);
-        requestWeather(weatherId);
+        if (weatherString != null){
+            Weather weather = Utility.handelWeatherResponse(weatherString);
+            showWeatherInfo(weather);
+        }else {
+            weatherLayout.setVisibility(View.INVISIBLE);
+            requestWeather(weatherId);
+        }
 
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -185,6 +186,8 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     private void showWeatherInfo(Weather weather) {
+
+
         String cityName = weather.basic.cityName;
         String updateTime = weather.basic.update.updateTime.split(" ")[1];
         String degree = weather.now.temperature + "°C";
@@ -222,5 +225,12 @@ public class WeatherActivity extends AppCompatActivity {
         weatherLayout.setVisibility(View.VISIBLE);
 
         swipeRefreshLayout.setRefreshing(false);
+
+        if (weather != null && "ok".equals(weather.status)){
+            Intent intent = new Intent(this, AutoUpdateService.class);
+            startService(intent);
+        }else {
+            Toast.makeText(WeatherActivity.this, "获取天气失败", Toast.LENGTH_SHORT).show();
+        }
     }
 }
