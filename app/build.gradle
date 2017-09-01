@@ -11,6 +11,16 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    productFlavors {
+        qihoo {
+            applicationId "com.example.zhudong.coolweather.qihoo"
+        }
+
+        baidu {
+            applicationId "com.example.zhudong.coolweather.baidu"
+        }
+    }
     //签名配置
     signingConfigs {
         config {
@@ -29,6 +39,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
+        }
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
         }
     }
 }
